@@ -7,13 +7,17 @@ console.log("FX remote");
 
 
 const argv = minimist(process.argv.slice(2), {
-    string: ["name", "options"]
+    string: ["name", "option", "host"],
+    default: {
+        "host": "192.168.2.101",
+        //"name": "rainbow"
+    }
 });
 
 
 
 
-const ws = new WebSocket("ws://192.168.2.101:8080");
+const ws = new WebSocket(`ws://${argv.host}:8080`);
 
 ws.on("message", (data) => {
     console.log(data);
@@ -24,9 +28,24 @@ ws.on("open", () => {
 
     console.log("Connected to WebSocket Server");
 
-    const message = JSON.stringify({
-        fx: argv.name
-    });
+    const obj = {};
+
+    if (argv.name) {
+        obj.fx = argv.name;
+    }
+
+    if (argv.option) {
+
+        let parts = argv.option.split("=");
+
+        obj.options = {
+            [parts[0]]: parts[1]
+        }
+
+    }
+
+    //console.log(obj)
+    const message = JSON.stringify(obj);
 
     console.log(message)
 
